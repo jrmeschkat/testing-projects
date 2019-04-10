@@ -33,6 +33,8 @@
     "webpack-hot-middleware": "^2.24.3"
   },
   "dependencies": {
-    "nw": "^0.37.2-sdk"
+    "jquery": "^2.1.4",
+    "nw": "^0.37.2-sdk",
+    "three": "^0.72.0"
   }
 }

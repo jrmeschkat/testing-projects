@@ -1,8 +1,13 @@
 import styles from './styles/index';
 import libraries from './libraries/index';
+import * as THREE from 'three';
+import $ from 'jquery';
+import { localize } from './js/localization';
+import { GUI } from './js/gui';
+import { appUpdater } from './js/appUpdater';
+import { CONFIGURATOR } from './js/data_storage';
 
 /*global $, chrome, analytics*/
-('use strict');
 
 // Google Analytics
 var googleAnalyticsService = analytics.getService('ice_cream_app');
@@ -123,7 +128,14 @@ $(document).ready(function() {
   appUpdater.checkRelease(chrome.runtime.getManifest().version);
 
   // log library versions in console to make version tracking easier
-  console.log('Libraries: jQuery - ' + $.fn.jquery + ', d3 - ' + d3.version + ', three.js - ' + THREE.REVISION);
+  console.log(
+    'Libraries: jQuery - ' +
+      $.fn.jquery +
+      ', d3 - ' +
+      d3.version +
+      ', three.js - ' +
+      THREE.REVISION
+  );
 
   // Tabs
   var ui_tabs = $('#tabs > ul');
@@ -147,7 +159,10 @@ $(document).ready(function() {
       var tab = tabClass.substring(4);
       var tabName = $(self).text();
 
-      if (CONFIGURATOR.connectionValid && semver.lt(CONFIG.flightControllerVersion, '2.0.0')) {
+      if (
+        CONFIGURATOR.connectionValid &&
+        semver.lt(CONFIG.flightControllerVersion, '2.0.0')
+      ) {
         $('#battery_profile_change').hide();
         $('#profile_change').css('width', '125px');
         $('#dataflash_wrapper_global').css('width', '125px');
@@ -305,7 +320,10 @@ $(document).ready(function() {
 
         // if notifications are enabled, or wasn't set, check the notifications checkbox
         chrome.storage.local.get('update_notify', function(result) {
-          if (typeof result.update_notify === 'undefined' || result.update_notify) {
+          if (
+            typeof result.update_notify === 'undefined' ||
+            result.update_notify
+          ) {
             $('div.notifications input').prop('checked', true);
           }
         });
@@ -330,7 +348,8 @@ $(document).ready(function() {
 
         function close_and_cleanup(e) {
           if (
-            (e.type == 'click' && !$.contains($('div#options-window')[0], e.target)) ||
+            (e.type == 'click' &&
+              !$.contains($('div#options-window')[0], e.target)) ||
             (e.type == 'keyup' && e.keyCode == 27)
           ) {
             $(document).unbind('click keyup', close_and_cleanup);
@@ -490,7 +509,7 @@ $(document).ready(function() {
 
   profile_e.change(function() {
     var profile = parseInt($(this).val());
-    MSP.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function() {
+    msp.send_message(MSPCodes.MSP_SELECT_SETTING, [profile], false, function() {
       GUI.log(chrome.i18n.getMessage('pidTuningLoadedProfile', [profile + 1]));
       updateActivatedTab();
     });
@@ -500,10 +519,17 @@ $(document).ready(function() {
 
   batteryprofile_e.change(function() {
     var batteryprofile = parseInt($(this).val());
-    MSP.send_message(MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE, [batteryprofile], false, function() {
-      GUI.log(chrome.i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1]));
-      updateActivatedTab();
-    });
+    msp.send_message(
+      MSPCodes.MSP2_INAV_SELECT_BATTERY_PROFILE,
+      [batteryprofile],
+      false,
+      function() {
+        GUI.log(
+          chrome.i18n.getMessage('loadedBatteryProfile', [batteryprofile + 1])
+        );
+        updateActivatedTab();
+      }
+    );
   });
 });
 
